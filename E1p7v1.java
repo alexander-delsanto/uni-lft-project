@@ -1,4 +1,4 @@
-public class E1p7{
+public class E1p7v1{
 	public static void main(String[] args){
 		if (args.length == 0)
 			System.out.println("You didn't enter any argument.");
