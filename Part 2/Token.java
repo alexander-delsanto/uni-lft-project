@@ -22,5 +22,6 @@ public class Token {
             mult = new Token('*'),
             div = new Token('/'),
             semicolon = new Token(';'),
-            comma = new Token(',');
+            comma = new Token(','),
+            comment = new Token(' ');
 }

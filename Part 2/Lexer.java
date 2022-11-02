@@ -15,6 +15,15 @@ public class Lexer {
 
     private Token tokenToWord(BufferedReader br) {
         String s = "";
+        if (peek == '_') {
+            do {
+                s += peek;
+                readch(br);
+            } while(peek == '_');
+        } if (!Character.isLetterOrDigit(peek)) {
+            System.err.println("Identifier cannot be composed by only '_'.");
+            return null;
+        }
         do {
             s += peek;
             readch(br);
@@ -36,6 +45,31 @@ public class Lexer {
             default -> new Word(Tag.ID, s);
         };
 
+    }
+
+    private void inLineComment(BufferedReader br) {
+        boolean found = false;
+        while(!found) {
+            readch(br);
+            if (peek == '\n' || peek == (char) -1)
+                found = true;
+        }
+        peek = ' ';
+    }
+
+    private void comment(BufferedReader br) {
+        boolean found = false;
+        while(!found) {
+            readch(br);
+            if (peek == '*') {
+                while (peek == '*') {
+                    readch(br);
+                    if (peek == '/')
+                        found = true;
+                }
+            }
+        }
+        peek = ' ';
     }
 
     private Token tokenToNumber(BufferedReader br) {
@@ -109,8 +143,19 @@ public class Lexer {
                 return Token.mult;
 
             case '/':
-                peek = ' ';
-                return Token.div;
+                readch(br);
+                if (peek == '/') {
+                    inLineComment(br);
+                    return Token.comment;
+                }
+                else if (peek == '*') {
+                    comment(br);
+                    return Token.comment;
+                }
+                else {    
+                    peek = ' ';
+                    return Token.div;
+                }
 
             case ';':
                 peek = ' ';
@@ -187,7 +232,7 @@ public class Lexer {
                 return new Token(Tag.EOF);
 
             default:
-                if (Character.isLetter(peek)) {
+                if (Character.isLetter(peek) || peek == '_') {
                     return tokenToWord(br);
                 } else if (Character.isDigit(peek)) {
                     return tokenToNumber(br);
