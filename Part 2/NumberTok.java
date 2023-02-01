@@ -1,13 +1,6 @@
 public class NumberTok extends Token {
-
-    private int val;
-
-    public NumberTok(int val) {
-        super(Tag.NUM);
-        this.val = val;
-    }
-
-    public String toString() {
-        return "<" + tag + ", " + val + ">";
-    }
+	public int number;
+	public NumberTok(int number) {super(Tag.NUM); this.number = number;}
+	public String toString() {return "<" + tag + ", " + number + ">";}
+	public int getNumber() {return number;}
 }
