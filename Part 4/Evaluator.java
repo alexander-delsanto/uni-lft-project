@@ -41,97 +41,97 @@ public class Evaluator {
 	}
 
 	private int expr() {
-		int exprp_i, expr_val;
+		int exprp_i, expr_val = 0;
 		switch (look.tag) {
 			case '(':
 			case Tag.NUM:
 				exprp_i = term();
 				expr_val = exprp(exprp_i);
-				return expr_val;
+				break;
 			default:
 				error("found " + look + " in expr with guide {(, NUM}");
 		}
-		return -1;
+		return expr_val;
 	}
 
 	private int exprp(int exprp_i) {
-		int exprp_val;
+		int exprp_val = 0;
 		switch (look.tag) {
 			case '+':
 				match('+');
 				exprp_i += term();
 				exprp_val = exprp(exprp_i);
-				return exprp_val;
+				break;
 			case '-':
 				match('-');
 				exprp_i -= term();
 				exprp_val = exprp(exprp_i);
-				return exprp_val;
+				break;
 			case ')':
 			case Tag.EOF:
 				exprp_val = exprp_i;
-				return exprp_val;
+				break;
 			default:
 				error("found " + look + " in exprp with guide {+, -, ), EOF}");
 		}
-		return -1;
+		return exprp_val;
 	}
 
 	private int term() {
-		int termp_i, term_val;
+		int termp_i, term_val = 0;
 		switch (look.tag) {
 			case '(':
 			case Tag.NUM:
 				termp_i = fact();
 				term_val = termp(termp_i);
-				return term_val;
+				break;
 			default:
 				error("found " + look + " in term with guide {(, NUM}");
 		}
-		return -1;
+		return term_val;
 	}
 
 	private int termp(int termp_i) {
-		int termp_val;
+		int termp_val = 0;
 		switch (look.tag) {
 			case '*':
 				match('*');
 				termp_i *= fact();
 				termp_val = termp(termp_i);
-				return termp_val;
+				break;
 			case '/':
 				match('/');
 				termp_i /= fact();
 				termp_val = termp(termp_i);
-				return termp_val;
+				break;
 			case '+':
 			case '-':
 			case ')':
 			case Tag.EOF:
 				termp_val = termp_i;
-				return termp_val;
+				break;
 			default:
 				error("found " + look + " in termp with guide {*, /, +, -, ), EOF}");
 		}
-		return -1;
+		return termp_val;
 	}
 
 	private int fact() {
-		int fact_val;
+		int fact_val = 0;
 		switch (look.tag) {
 			case '(':
 				match('(');
 				fact_val = expr();
 				match(')');
-				return fact_val;
+				break;
 			case Tag.NUM:
 				fact_val = ((NumberTok)look).getNumber();
 				match(Tag.NUM);
-				return fact_val;
+				break;
 			default:
 				error("found " + look + " in fact with guide {(, NUM}");
 		}
-		return -1;
+		return fact_val;
 	}
 
 	public static void main(String[] args) {
