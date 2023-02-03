@@ -16,14 +16,14 @@ public class Evaluator {
 		System.out.println("token = " + look);
 	}
 
-	private void error(String s) {
-		throw new Error("near line " + Lexer.line + ": " + s);
+	private Error error(String s) {
+		return new Error("near line " + Lexer.line + ": " + s);
 	}
 
 	private void match(int t) {
 		if (look.tag == t) {
 			if (look.tag != Tag.EOF) move();
-		} else error("syntax error");
+		} else throw error("syntax error");
 	}
 
 	public void start() {
@@ -36,12 +36,12 @@ public class Evaluator {
 				System.out.println("Result: " + expr_val);
 				break;
 			default:
-				error("found " + look + " in start with guide {(, NUM}");
+				throw error("found " + look + " in start with guide {(, NUM}");
 		}
 	}
 
 	private int expr() {
-		int exprp_i, expr_val = 0;
+		int exprp_i, expr_val;
 		switch (look.tag) {
 			case '(':
 			case Tag.NUM:
@@ -49,13 +49,13 @@ public class Evaluator {
 				expr_val = exprp(exprp_i);
 				break;
 			default:
-				error("found " + look + " in expr with guide {(, NUM}");
+				throw error("found " + look + " in expr with guide {(, NUM}");
 		}
 		return expr_val;
 	}
 
 	private int exprp(int exprp_i) {
-		int exprp_val = 0;
+		int exprp_val;
 		switch (look.tag) {
 			case '+':
 				match('+');
@@ -72,13 +72,13 @@ public class Evaluator {
 				exprp_val = exprp_i;
 				break;
 			default:
-				error("found " + look + " in exprp with guide {+, -, ), EOF}");
+				throw error("found " + look + " in exprp with guide {+, -, ), EOF}");
 		}
 		return exprp_val;
 	}
 
 	private int term() {
-		int termp_i, term_val = 0;
+		int termp_i, term_val;
 		switch (look.tag) {
 			case '(':
 			case Tag.NUM:
@@ -86,13 +86,13 @@ public class Evaluator {
 				term_val = termp(termp_i);
 				break;
 			default:
-				error("found " + look + " in term with guide {(, NUM}");
+				throw error("found " + look + " in term with guide {(, NUM}");
 		}
 		return term_val;
 	}
 
 	private int termp(int termp_i) {
-		int termp_val = 0;
+		int termp_val;
 		switch (look.tag) {
 			case '*':
 				match('*');
@@ -111,13 +111,13 @@ public class Evaluator {
 				termp_val = termp_i;
 				break;
 			default:
-				error("found " + look + " in termp with guide {*, /, +, -, ), EOF}");
+				throw error("found " + look + " in termp with guide {*, /, +, -, ), EOF}");
 		}
 		return termp_val;
 	}
 
 	private int fact() {
-		int fact_val = 0;
+		int fact_val;
 		switch (look.tag) {
 			case '(':
 				match('(');
@@ -129,19 +129,18 @@ public class Evaluator {
 				match(Tag.NUM);
 				break;
 			default:
-				error("found " + look + " in fact with guide {(, NUM}");
+				throw error("found " + look + " in fact with guide {(, NUM}");
 		}
 		return fact_val;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		Lexer lex = new Lexer();
 		String path = "input.txt"; // il percorso del file da leggere
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(path));
-			Evaluator Evaluator = new Evaluator(lex, br);
-			Evaluator.start();
-			br.close();
-		} catch (IOException e) {e.printStackTrace();}
+
+		BufferedReader br = new BufferedReader(new FileReader(path));
+		Evaluator Evaluator = new Evaluator(lex, br);
+		Evaluator.start();
+		br.close();
 	}
 }

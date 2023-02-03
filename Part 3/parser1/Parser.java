@@ -16,14 +16,14 @@ public class Parser {
 		System.out.println("token = " + look);
 	}
 
-	private void error(String s) {
-	throw new Error("near line " + Lexer.line + ": " + s);
+	private Error error(String s) {
+		return new Error("near line " + Lexer.line + ": " + s);
 	}
 
 	private void match(int t) {
-	if (look.tag == t) {
-		if (look.tag != Tag.EOF) move();
-	} else error("syntax error");
+		if (look.tag == t) {
+			if (look.tag != Tag.EOF) move();
+		} else throw error("syntax error");
 	}
 
 	public void start() {
@@ -33,8 +33,8 @@ public class Parser {
 				expr();
 				match(Tag.EOF);
 				break;
-			default: 
-				error("found " + look + " in start with guide {(, NUM}");
+			default:
+				throw error("found " + look + " in start with guide {(, NUM}");
 		}
 	}
 
@@ -45,8 +45,8 @@ public class Parser {
 				term();
 				exprp();
 				break;
-			default: 
-				error("found " + look + " in expr with guide {(, NUM}");
+			default:
+				throw error("found " + look + " in expr with guide {(, NUM}");
 		}
 	}
 
@@ -65,8 +65,8 @@ public class Parser {
 			case ')':
 			case Tag.EOF:
 				break;
-			default: 
-				error("found " + look + " in exprp with guide {+, -, ), EOF}");
+			default:
+				throw error("found " + look + " in exprp with guide {+, -, ), EOF}");
 		}
 	}
 
@@ -77,8 +77,8 @@ public class Parser {
 				fact();
 				termp();
 				break;
-			default: 
-				error("found " + look + " in term with guide {(, NUM}");
+			default:
+				throw error("found " + look + " in term with guide {(, NUM}");
 		}
 	}
 
@@ -99,8 +99,8 @@ public class Parser {
 			case ')':
 			case Tag.EOF:
 				break;
-			default: 
-				error("found " + look + " in termp with guide {*, /, +, -, ), EOF}");
+			default:
+				throw error("found " + look + " in termp with guide {*, /, +, -, ), EOF}");
 		}
 	}
 
@@ -115,19 +115,18 @@ public class Parser {
 				match(Tag.NUM);
 				break;
 			default:
-				error("found " + look + " in fact with guide {(, NUM}");
+				throw error("found " + look + " in fact with guide {(, NUM}");
 		}
 	}
-		
-	public static void main(String[] args) {
+
+	public static void main(String[] args) throws IOException {
 		Lexer lex = new Lexer();
 		String path = "input.txt"; // il percorso del file da leggere
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(path));
-			Parser parser = new Parser(lex, br);
-			parser.start();
-			System.out.println("Input OK");
-			br.close();
-		} catch (IOException e) {e.printStackTrace();}
+
+		BufferedReader br = new BufferedReader(new FileReader(path));
+		Parser parser = new Parser(lex, br);
+		parser.start();
+		System.out.println("Input OK");
+		br.close();
 	}
 }

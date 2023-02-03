@@ -16,14 +16,14 @@ public class Parser {
 		System.out.println("token = " + look);
 	}
 
-	private void error(String s) {
-	throw new Error("near line " + Lexer.line + ": " + s);
+	private Error error(String s) {
+		return new Error("near line " + Lexer.line + ": " + s);
 	}
 
 	private void match(int t) {
-	if (look.tag == t) {
-		if (look.tag != Tag.EOF) move();
-	} else error("syntax error");
+		if (look.tag == t) {
+			if (look.tag != Tag.EOF) move();
+		} else throw error("syntax error");
 	}
 
 	public void prog() {
@@ -38,7 +38,7 @@ public class Parser {
 				match(Tag.EOF);
 				break;
 		default:
-			error("found " + look + " in prog");
+			throw error("found " + look + " in prog");
 		}
 	}
 
@@ -54,7 +54,7 @@ public class Parser {
 				statlistp();
 				break;
 		default:
-			error("found " + look + " in statlist");
+			throw error("found " + look + " in statlist");
 		}
 	}
 
@@ -69,7 +69,7 @@ public class Parser {
 			case '}':
 				break;
 			default:
-				error("found " + look + " in statlist");
+				throw error("found " + look + " in statlist");
 		}
 	}
 
@@ -113,7 +113,7 @@ public class Parser {
 				match('}');
 				break;
 			default:
-				error("found " + look + " in stat");
+				throw error("found " + look + " in stat");
 		}
 	}
 
@@ -128,7 +128,7 @@ public class Parser {
 				match(Tag.END);
 				break;
 			default:
-				error("found " + look + " in statp");
+				throw error("found " + look + " in statp");
 		}
 	}
 
@@ -139,7 +139,7 @@ public class Parser {
 				idlistp();
 				break;
 			default:
-				error("found " + look + " in idlist");
+				throw error("found " + look + " in idlist");
 		}
 	}
 
@@ -158,7 +158,7 @@ public class Parser {
 			case ';':
 				break;
 			default:
-				error("found " + look + " in idlistp");
+				throw error("found " + look + " in idlistp");
 		}
 	}
 
@@ -169,7 +169,7 @@ public class Parser {
 				optlistp();
 				break;
 			default:
-				error("found " + look + " in optlist");
+				throw error("found " + look + " in optlist");
 		}
 	}
 
@@ -182,7 +182,7 @@ public class Parser {
 			case ']':
 				break;
 			default:
-				error("found " + look + " in optlistp");
+				throw error("found " + look + " in optlistp");
 		}
 	}
 
@@ -197,7 +197,7 @@ public class Parser {
 				stat();
 				break;
 			default:
-				error("found " + look + " in optitem");
+				throw error("found " + look + " in optitem");
 		}
 	}
 
@@ -209,7 +209,7 @@ public class Parser {
 				expr();
 				break;
 			default:
-				error("found " + look + " in bexpr");
+				throw error("found " + look + " in bexpr");
 		}
 	}
 
@@ -244,7 +244,7 @@ public class Parser {
 				match(Tag.ID);
 				break;
 			default:
-				error("found " + look + " in expr");
+				throw error("found " + look + " in expr");
 		}
 	}
 
@@ -260,7 +260,7 @@ public class Parser {
 				exprlistp();
 				break;
 			default:
-				error("found " + look + " in exprlist");
+				throw error("found " + look + " in exprlist");
 		}
 	}
 
@@ -275,19 +275,18 @@ public class Parser {
 			case ']':
 				break;
 			default:
-				error("found " + look + " in exprlistp");
+				throw error("found " + look + " in exprlistp");
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		Lexer lex = new Lexer();
 		String path = "input.txt"; // il percorso del file da leggere
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(path));
-			Parser parser = new Parser(lex, br);
-			parser.prog();
-			System.out.println("Input OK");
-			br.close();
-		} catch (IOException e) {e.printStackTrace();}
+
+		BufferedReader br = new BufferedReader(new FileReader(path));
+		Parser parser = new Parser(lex, br);
+		parser.prog();
+		System.out.println("Input OK");
+		br.close();
 	}
 }
