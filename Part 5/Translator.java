@@ -108,11 +108,16 @@ public class Translator {
 				match(']');
 				break;
 			case Tag.WHILE:
+				int lwhile_end = code.newLabel();
+				int lwhile_start = code.newLabel();
+				code.emitLabel(lwhile_start);
 				match(Tag.WHILE);
 				match('(');
-				bexpr();
+				bexpr(lwhile_end);
 				match(')');
 				stat();
+				code.emit(OpCode.GOto, lwhile_start);
+				code.emitLabel(lwhile_end);
 				break;
 			case Tag.COND:
 				match(Tag.COND);
@@ -227,7 +232,7 @@ public class Translator {
 			case Tag.OPTION:
 				match(Tag.OPTION);
 				match('(');
-				bexpr();
+				bexpr(0);
 				match(')');
 				match(Tag.DO);
 				stat();
@@ -237,12 +242,35 @@ public class Translator {
 		}
 	}
 
-	public void bexpr() {
+	public void bexpr(int label) {
 		switch(look.tag) {
 			case Tag.RELOP:
+				String temp = ((Word)look).lexeme;
 				match(Tag.RELOP);
 				expr();
 				expr();
+				switch(temp) {
+					case "<":
+						code.emit(OpCode.if_icmpgt, label);
+						break;
+					case ">":
+						code.emit(OpCode.if_icmplt, label);
+						break;
+					case "<=":
+						code.emit(OpCode.if_icmpgt, label);
+						break;
+					case ">=":
+						code.emit(OpCode.if_icmplt, label);
+						break;
+					case "==":
+						code.emit(OpCode.if_icmpne, label);
+						break;
+					case "<>":
+						code.emit(OpCode.if_icmpeq, label);
+						break;
+					default:
+						break;
+				}
 				break;
 			default:
 				throw error("found " + look + " in bexpr");

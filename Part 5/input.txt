@@ -1,0 +1,5 @@
+assign 10 to x;
+
+while(> x 0) {
+        assign - x 1 to x
+}
