@@ -5,7 +5,7 @@ public class Lexer {
 	public static int line = 1;
 	private char peek = ' ';
 	public static final char EOF = (char) -1;
-	
+
 	private void readch(BufferedReader br) {
 		try {
 			peek = (char) br.read();
@@ -32,7 +32,7 @@ public class Lexer {
 	private Token getWordToken(BufferedReader br) {
 		String s = "";
 		boolean invalidWord = true;
-		
+
 		do {
 			s += peek;
 			if (invalidWord && peek != '_')
@@ -66,7 +66,7 @@ public class Lexer {
 				if (peek == '\n') line++;
 				readch(br);
 			}
-			
+
 			switch (peek) {
 			case '(': peek = ' '; return Word.lpt;
 			case ')': peek = ' '; return Word.rpt;
@@ -80,7 +80,7 @@ public class Lexer {
 			case ';': peek = ' '; return Token.semicolon;
 			case ',': peek = ' '; return Token.comma;
 			case '!': peek = ' '; return Token.not;
-		
+
 			case '/':
 				readch(br);
 				if (peek == '/') {
@@ -92,13 +92,13 @@ public class Lexer {
 						prev = peek;
 						readch(br);
 					} while (peek != EOF && !(prev == '*' && peek =='/'));
-					if (peek == EOF) 
+					if (peek == EOF)
 						throw new Error("A comment starting with \"/*\" was never closed.");
 					peek = ' ';
-				} else 
+				} else
 					return Token.div;
 				break;
-			
+
 
 			case '&':
 				readch(br);
@@ -107,7 +107,7 @@ public class Lexer {
 
 			case '|':
 				readch(br);
-				if (peek == '|') {peek = ' '; return Word.or;} 
+				if (peek == '|') {peek = ' '; return Word.or;}
 				else throw new Error("Erroneous character after | : "  + peek );
 
 			case '<':
@@ -122,22 +122,22 @@ public class Lexer {
 				if (peek == ' ') {return Word.gt;}
 				else if (peek == '=') {peek = ' '; return Word.ge;}
 				else throw new Error("Erroneous character after > : "  + peek );
-					
+
 			case '=':
 				readch(br);
 				if (peek == '=') {peek = ' '; return Word.eq;}
 				else throw new Error("Erroneous character after > : "  + peek );
-			
+
 			case EOF: return new Token(Tag.EOF);
 
 			default:
-				if (Character.isLetter(peek)) {return getWordToken(br);} 
+				if (Character.isLetter(peek) || peek == '_') {return getWordToken(br);}
 				else if (Character.isDigit(peek)) {return getNumberToken(br);}
 				else throw new Error("Erroneous character: " + peek );
 			}
 		}
 	}
-		
+
 	public static void main(String[] args) {
 		Lexer lex = new Lexer();
 		String path = "input.txt";
@@ -150,7 +150,7 @@ public class Lexer {
 			} while (tok.tag != Tag.EOF);
 			System.out.println();
 			br.close();
-		} catch (IOException e) {e.printStackTrace();}	
+		} catch (IOException e) {e.printStackTrace();}
 	}
 
 }
