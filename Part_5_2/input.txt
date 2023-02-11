@@ -1,0 +1,30 @@
+/* Fibonacci
+assign 0 to x;
+assign 1 to y;
+assign 0 to z;
+read[r];
+
+while (< z r) {
+        assign +(x, y) to z;
+        assign y to x;
+        assign z to y
+};
+
+print[z]
+*/
+
+/*
+assign 0 to r;
+read[n];
+assign 0 to i;
+
+while(< i n) {
+        assign +(r, i) to r;
+        assign +(i, 1) to i
+};
+print[r]
+*/
+
+conditional [
+        option (|| && > 1 3 > 6 5 > 5 4) do print[1]
+] else print[0] end
