@@ -1,11 +1,25 @@
-assign 10 to x;
-assign 8 to y;
-conditional [
-        option (< y x) do print[y]
-        option (< x y) do print[x]
-        option (< x y) do print[x]
-] else conditional [
-        option (< y x) do print[y]
-        option (< x y) do print[x]
-        option (< x y) do print[x]
-] end end
+/* Fibonacci
+assign 0 to x;
+assign 1 to y;
+assign 0 to z;
+read[r];
+
+while (< z r) {
+        assign +(x, y) to z;
+        assign y to x;
+        assign z to y
+};
+
+print[z]
+*/
+
+
+assign 0 to r;
+read[n];
+assign 0 to i;
+
+while(< i n) {
+        assign +(r, i) to r;
+        assign +(i, 1) to i
+};
+print[r]
