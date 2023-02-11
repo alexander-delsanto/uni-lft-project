@@ -1,5 +1,11 @@
 assign 10 to x;
-
-while(> x 0) {
-        assign - x 1 to x
-}
+assign 8 to y;
+conditional [
+        option (< y x) do print[y]
+        option (< x y) do print[x]
+        option (< x y) do print[x]
+] else conditional [
+        option (< y x) do print[y]
+        option (< x y) do print[x]
+        option (< x y) do print[x]
+] end end

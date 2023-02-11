@@ -122,9 +122,11 @@ public class Translator {
 			case Tag.COND:
 				match(Tag.COND);
 				match('[');
-				optlist();
+				int lend = code.newLabel();
+				optlist(lend);
 				match(']');
 				statp();
+				code.emitLabel(lend);
 				break;
 			case '{':
 				match('{');
@@ -203,22 +205,28 @@ public class Translator {
 		}
 	}
 
-	public void optlist() {
+	public void optlist(int endLabel) {
 		switch(look.tag) {
 			case Tag.OPTION:
-				optitem();
-				optlistp();
+				int lnext = code.newLabel();
+				optitem(lnext);
+				code.emit(OpCode.GOto, endLabel);
+				code.emitLabel(lnext);
+				optlistp(endLabel);
 				break;
 			default:
 				throw error("found " + look + " in optlist");
 		}
 	}
 
-	public void optlistp() {
+	public void optlistp(int endLabel) {
 		switch(look.tag) {
 			case Tag.OPTION:
-				optitem();
-				optlistp();
+				int lnext = code.newLabel();
+				optitem(lnext);
+				code.emit(OpCode.GOto, endLabel);
+				code.emitLabel(lnext);
+				optlistp(endLabel);
 				break;
 			case ']':
 				break;
@@ -227,12 +235,12 @@ public class Translator {
 		}
 	}
 
-	public void optitem() {
+	public void optitem(int nextLabel) {
 		switch(look.tag) {
 			case Tag.OPTION:
 				match(Tag.OPTION);
 				match('(');
-				bexpr(0);
+				bexpr(nextLabel);
 				match(')');
 				match(Tag.DO);
 				stat();
@@ -251,10 +259,10 @@ public class Translator {
 				expr();
 				switch(temp) {
 					case "<":
-						code.emit(OpCode.if_icmpgt, label);
+						code.emit(OpCode.if_icmpge, label);
 						break;
 					case ">":
-						code.emit(OpCode.if_icmplt, label);
+						code.emit(OpCode.if_icmple, label);
 						break;
 					case "<=":
 						code.emit(OpCode.if_icmpgt, label);
