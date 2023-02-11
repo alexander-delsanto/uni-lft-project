@@ -19,7 +19,7 @@ public class Lexer {
 		readch(br);
 
 		while (Character.isDigit(peek)) {
-			num *= 10 + peek - '0';
+			num = num * 10 + peek - '0';
 			readch(br);
 		}
 
