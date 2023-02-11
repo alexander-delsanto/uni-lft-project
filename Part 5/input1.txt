@@ -1,0 +1,12 @@
+read[x,y];
+conditional[
+ option (== x y) do print[111]
+ option (&& > x - y 10 < x +(y,10)) do print[222]
+ ] else print[333] 
+ end;
+while (> y 0)
+ conditional  
+  [ option (<= x y) do {assign - y 1 to y; print[y]} ]
+  else {assign - y 2 to y; print[y]}
+  end;
+print[1,+(2,*(3,4,5))]
