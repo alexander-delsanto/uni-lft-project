@@ -18,6 +18,9 @@ public class Lexer {
 		int num = peek - '0';
 		readch(br);
 
+		if (num == 0 && Character.isDigit(peek))
+			throw new Error("Erroneous character after 0: " + peek);
+
 		while (Character.isDigit(peek)) {
 			num = num * 10 + peek - '0';
 			readch(br);
