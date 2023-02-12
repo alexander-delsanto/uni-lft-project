@@ -12,53 +12,23 @@ public class E1p3 {
 		int i = 0;
 		while(state >= 0 && i < s.length()) {
 			final char ch = s.charAt(i++);
-			if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9')))
-				state = -1;
-			switch (state) {
-				case 0: //STATO INIZIALE
-					if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 == 0))
-						state = 2;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 != 0))
-						state = 3;
-					else
-						state = 1;
-					break;
-					
-				case 1: //POZZO
-					if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
-						state = 1;
-					break;
-					
-				case 2: //PARI
-					if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 == 0))
-						state = 2;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 != 0))
-						state = 3;
-					else if ((ch >= 'A' && ch <= 'K'))
-						state = 4;
-					else
-						state = 1;
-					break;
-					
-				case 3: //DISPARI
-					if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 != 0))
-						state = 3;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 == 0))
-						state = 2;
-					else if ((ch >= 'L' && ch <= 'Z'))
-						state = 4;
-					else
-						state = 1;
-					break;
-					
-				case 4: //STATO FINALE
-					if ((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
-						state = 1;
-					else
-						state = 4;
-					break;
+
+			state = switch (state) {
+				case 0 -> getstate(c, 1, 2, -1, -1);
+				case 1 -> getstate(c, 1, 2, 3, -1);
+				case 2 -> getstate(c, 1, 2, -1, 3);
+				case 3 -> getstate(c, -1, -1, 3, 3);
+				case -1 -> getstate(c, -1, -1, -1, -1);
 			}
 		}
-		return state == 4;
+		return state == 3;
+	}
+
+	public static int getstate(char c, int isEven, int isOdd, int isGA, int isGB) {
+		if(c == '0' || c == '2' || c == '4' || c == '6' || c == '8') return isEven;
+		if(c == '1' || c == '3' || c == '5' || c == '7' || c == '9') return isOdd;
+		if((c >= 'a' || c <= 'k') || (c >= 'A' || c <= 'K')) return isGA;
+		if((c >= 'l' || c <= 'z') || (c >= 'L' || c <= 'Z')) return isGB;
+		return -1;
 	}
 }

@@ -6,36 +6,23 @@ public class E1p1 {
         while (state >= 0 && i < s.length()) {
             final char ch = s.charAt(i++);
 
-            if (ch != '0' && ch != '1')
-                state = -1;
-            switch (state) {
-            case 0:
-                if (ch == '0')
-                    state = 1;
-                else if (ch == '1')
-                    state = 0;
-                break;
-            case 1:
-                if (ch == '0')
-                    state = 2;
-                else if (ch == '1')
-                    state = 0;
-                break;
-
-            case 2:
-                if (ch == '0')
-                    state = 3;
-                else if (ch == '1')
-                    state = 0;
-                break;
-
-            case 3:
-                if (ch == '0' || ch == '1')
-                    state = 3;
-                break;
+            state = switch (state) {
+                case 0 -> getstate(ch, 1, 0);
+                case 1 -> getstate(ch, 2, 0);
+                case 2 -> getstate(ch, 3, 0);
+                case 3 -> getstate(ch, 3, 3);
+                case -1 -> getstate(ch, -1, -1);
             }
         }
-        return ((state == 0 || state == 1 || state == 2) && s.length() != 0);
+        return state == 3;
+    }
+
+    public static void getstate(char c, int is0, int is1) {
+        return switch(c) {
+            case 0 -> is0;
+            case 1 -> is1;
+            default -> -1;
+        }
     }
 
     public static void main(String[] args) {

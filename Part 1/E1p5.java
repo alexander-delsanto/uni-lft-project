@@ -12,83 +12,26 @@ public class E1p5 {
 		int i = 0;
 		while(state >= 0 && i < s.length()) {
 			final char ch = s.charAt(i++);
-			if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9')))
-				state = -1;
-			switch (state) {
-				case 0: //STATO INIZIALE
-					if (ch >= 'A' && ch <= 'K')
-						state = 2;
-					else if (ch >= 'L' && ch <= 'Z')
-						state = 3;
-					else
-						state = 1;
-					break;
-					
-				case 1: //POZZO
-					if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
-						state = 1;
-					break;
-					
-				case 2: //COGNOMI A-K
-					if (ch >= 'a' && ch <= 'z')
-						state = 2;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 == 0))
-						state = 4;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 != 0))
-						state = 5;
-					else
-						state = 1;
-					break;
-					
-				case 3: //COGNOMI L-Z
-					if (ch >= 'a' && ch <= 'z')
-						state = 3;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 == 0))
-						state = 6;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 != 0))
-						state = 7;
-					else
-						state = 1;
-					break;
-					
-				case 4: //A-K PARI (STATO FINALE)
-					if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 == 0))
-						state = 4;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 != 0))
-						state = 5;
-					else 
-						state = 1;
-					break;
-					
-				case 5: //A-K DISPARI
-					if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 == 0))
-						state = 4;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 != 0))
-						state = 5;
-					else 
-						state = 1;
-					break;
 
-				case 6: //L-Z PARI 
-					if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 == 0))
-						state = 6;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 != 0))
-						state = 7;
-					else 
-						state = 1;
-					break;
-
-				case 7: //L-Z DISPARI (STATO FINALE)
- 					if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 == 0))
-						state = 6;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 != 0))
-						state = 7;
-					else 
-						state = 1;
-					break;
-					
+			state = switch (state) {
+				case 0 -> getstate(c, -1, -1, 1, 2);
+				case 1 -> getstate(c, 3, 4, 1, 1);
+				case 2 -> getstate(c, 5, 6, 2, 2);
+				case 3 -> getstate(c, 3, 4, -1, -1);
+				case 4 -> getstate(c, 3, 4, -1, -1);
+				case 5 -> getstate(c, 5, 6, -1, -1);
+				case 6 -> getstate(c, 5, 6, -1, -1);
+				case -1 -> getstate(c, -1, -1, -1, -1);)
 			}
 		}
-		return (state == 4 || state == 7);
+		return state == 3 || state == 6;
+	}
+
+	public static int getstate(char c, int isEven, int isOdd, int isGA, int isGB) {
+		if(c == '0' || c == '2' || c == '4' || c == '6' || c == '8') return isEven;
+		if(c == '1' || c == '3' || c == '5' || c == '7' || c == '9') return isOdd;
+		if((c >= 'a' || c <= 'k') || (c >= 'A' || c <= 'K')) return isGA;
+		if((c >= 'l' || c <= 'z') || (c >= 'L' || c <= 'Z')) return isGB;
+		return -1;
 	}
 }
