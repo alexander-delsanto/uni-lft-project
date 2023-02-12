@@ -1,7 +1,7 @@
 package part_5_1_translator;
 
 import part_2_lexer.*;
-import part_5_support.*;
+import part_5_0_support.*;
 
 import java.io.*;
 
