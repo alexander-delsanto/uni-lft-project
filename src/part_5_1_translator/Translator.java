@@ -5,7 +5,7 @@ import part_5_0_support.*;
 
 import java.io.*;
 
-enum _exprlistp {
+enum _exprEnum {
 	sum, mul, print
 };
 
@@ -103,7 +103,7 @@ public class Translator {
 			case Tag.PRINT:
 				match(Tag.PRINT);
 				match('[');
-				exprlist(_exprlistp.print);
+				exprlist(_exprEnum.print);
 				match(']');
 				break;
 			case Tag.READ:
@@ -127,11 +127,11 @@ public class Translator {
 			case Tag.COND:
 				match(Tag.COND);
 				match('[');
-				int lend = code.newLabel();
-				optlist(lend);
+				int lcond_end = code.newLabel();
+				optlist(lcond_end);
 				match(']');
 				statp();
-				code.emitLabel(lend);
+				code.emitLabel(lcond_end);
 				break;
 			case '{':
 				match('{');
@@ -161,14 +161,19 @@ public class Translator {
 	private void idlist(boolean isAssign) {
 		switch(look.tag) {
 		case Tag.ID:
+			/* Finds the address of the ID the hashmap and creates
+			 it if it doesn't exists */
 			int id_addr = st.lookupAddress(((Word)look).lexeme);
-			if (id_addr==-1) {
+			if (id_addr == -1) {
 				id_addr = count;
 				st.insert(((Word)look).lexeme,count++);
 			}
 			match(Tag.ID);
+			/* If isAssign and there is more than one ID in
+			 the list dup is needed before the istore instruction */
 			if(isAssign && look.tag==',')
 				code.emit(OpCode.dup);
+			/* Read */
 			else if(!isAssign) {
 				code.emit(OpCode.invokestatic, 0);
 			}
@@ -210,28 +215,28 @@ public class Translator {
 		}
 	}
 
-	public void optlist(int endLabel) {
+	public void optlist(int lcond_end) {
 		switch(look.tag) {
 			case Tag.OPTION:
-				int lnext = code.newLabel();
-				optitem(lnext);
-				code.emit(OpCode.GOto, endLabel);
-				code.emitLabel(lnext);
-				optlistp(endLabel);
+				int lnext_opt = code.newLabel();
+				optitem(lnext_opt);
+				code.emit(OpCode.GOto, lcond_end);
+				code.emitLabel(lnext_opt);
+				optlistp(lcond_end);
 				break;
 			default:
 				throw error("found " + look + " in optlist");
 		}
 	}
 
-	public void optlistp(int endLabel) {
+	public void optlistp(int lcond_end) {
 		switch(look.tag) {
 			case Tag.OPTION:
-				int lnext = code.newLabel();
-				optitem(lnext);
-				code.emit(OpCode.GOto, endLabel);
-				code.emitLabel(lnext);
-				optlistp(endLabel);
+				int lnext_opt = code.newLabel();
+				optitem(lnext_opt);
+				code.emit(OpCode.GOto, lcond_end);
+				code.emitLabel(lnext_opt);
+				optlistp(lcond_end);
 				break;
 			case ']':
 				break;
@@ -240,12 +245,12 @@ public class Translator {
 		}
 	}
 
-	public void optitem(int nextLabel) {
+	public void optitem(int lnext_opt) {
 		switch(look.tag) {
 			case Tag.OPTION:
 				match(Tag.OPTION);
 				match('(');
-				bexpr(nextLabel);
+				bexpr(lnext_opt);
 				match(')');
 				match(Tag.DO);
 				stat();
@@ -255,7 +260,7 @@ public class Translator {
 		}
 	}
 
-	public void bexpr(int label) {
+	public void bexpr(int lend_stat) {
 		switch(look.tag) {
 			case Tag.RELOP:
 				String temp = ((Word)look).lexeme;
@@ -264,22 +269,22 @@ public class Translator {
 				expr();
 				switch(temp) {
 					case "<":
-						code.emit(OpCode.if_icmpge, label);
+						code.emit(OpCode.if_icmpge, lend_stat);
 						break;
 					case ">":
-						code.emit(OpCode.if_icmple, label);
+						code.emit(OpCode.if_icmple, lend_stat);
 						break;
 					case "<=":
-						code.emit(OpCode.if_icmpgt, label);
+						code.emit(OpCode.if_icmpgt, lend_stat);
 						break;
 					case ">=":
-						code.emit(OpCode.if_icmplt, label);
+						code.emit(OpCode.if_icmplt, lend_stat);
 						break;
 					case "==":
-						code.emit(OpCode.if_icmpne, label);
+						code.emit(OpCode.if_icmpne, lend_stat);
 						break;
 					case "<>":
-						code.emit(OpCode.if_icmpeq, label);
+						code.emit(OpCode.if_icmpeq, lend_stat);
 						break;
 					default:
 						break;
@@ -295,7 +300,7 @@ public class Translator {
 			case '+':
 				match('+');
 				match('(');
-				exprlist(_exprlistp.sum);
+				exprlist(_exprEnum.sum);
 				match(')');
 				break;
 			case '-':
@@ -307,7 +312,7 @@ public class Translator {
 			case '*':
 				match('*');
 				match('(');
-				exprlist(_exprlistp.mul);
+				exprlist(_exprEnum.mul);
 				match(')');
 				break;
 			case '/':
@@ -332,7 +337,7 @@ public class Translator {
 		}
 	}
 
-	public void exprlist(_exprlistp val) {
+	public void exprlist(_exprEnum instruction) {
 		switch(look.tag) {
 			case '+':
 			case '-':
@@ -341,21 +346,21 @@ public class Translator {
 			case Tag.NUM:
 			case Tag.ID:
 				expr();
-				if(val == _exprlistp.print)
+				if(instruction == _exprEnum.print)
 					code.emit(OpCode.invokestatic, 1);
-				exprlistp(val);
+				exprlistp(instruction);
 				break;
 			default:
 				throw error("found " + look + " in exprlist");
 		}
 	}
 
-	public void exprlistp(_exprlistp val) {
+	public void exprlistp(_exprEnum instruction) {
 		switch(look.tag) {
 			case ',':
 				match(',');
 				expr();
-				switch(val) {
+				switch(instruction) {
 					case sum:
 						code.emit(OpCode.iadd);
 						break;
@@ -366,7 +371,7 @@ public class Translator {
 						code.emit(OpCode.invokestatic, 1);
 						break;
 				}
-				exprlistp(val);
+				exprlistp(instruction);
 				break;
 			case ')':
 			case ']':
