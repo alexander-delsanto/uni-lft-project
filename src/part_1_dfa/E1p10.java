@@ -1,34 +1,30 @@
 public class E1p10 {
-    public static boolean scan(String s)
-    {
-        int state = 0;
-        int i = 0;
-        while (state >= 0 && i < s.length()) {
-            final char ch = s.charAt(i++);
+	public static boolean scan(String s) {
+		int state = 0;
+		int i = 0;
+		while(state >= 0 && i < s.length()) {
+			final char c = s.charAt(i++);
 
-            state = switch (state) {
-                case 0 -> getstate(ch, 1, 0);
-                case 1 -> getstate(ch, 2, 0);
-                case 2 -> getstate(ch, 3, 0);
-                case 3 -> getstate(ch, 3, 3);
-		        default-> -1;
-            };
-        }
-        return state == 3;
-    }
-
-    public static int getstate(char c, int is0, int is1) {
-        return switch(c) {
-            case '0' -> is0;
-            case '1' -> is1;
-            default -> -1;
-        };
-    }
-
-    public static void main(String[] args) {
-        if (args.length == 0) System.out.println("You didn't enter any argument.");
-	for(int j = 0; j < args.length; j++) {
-		System.out.println(args[j] + " " + (scan(args[j]) ? "OK" : "NOPE"));
+			switch (state) {
+				case 0 ->state = getState(c, 0, 0, 1);
+				case 1 ->state = getState(c, 0, 2, 1);
+				case 2 ->state = getState(c, 2, 3, 2);
+				case 3 ->state = getState(c, 2, 3, 4);
+				case 4 ->state = getState(c, 0, 0, 1);
+			}
+		}
+		return state == 0 || state == 1 || state == 4;
 	}
-    }
+
+	public static void main(String[] args) {
+		for(String i : args)
+			System.out.println(scan(i) ? "OK" : "NO");
+	}
+
+	public static int getState(char c, int a, int star, int slash) {
+		if(c == '/') return slash;
+		if(c == '*') return star;
+		if(c == 'a') return a;
+		return -1;
+	}
 }
