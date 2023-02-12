@@ -1,5 +1,3 @@
-package part_1_dfa;
-
 public class E1p2 {
 	public static void main(String[] args) {
 		if (args.length == 0)
@@ -7,11 +5,6 @@ public class E1p2 {
 		for(int j = 0; j < args.length; j++) {
 			System.out.println(args[j] + " " + (scan(args[j]) ? "OK" : "NOPE"));
 		}
-		/*try {
-			System.out.println(scan(args[0]) ? "OK" : "NOPE");
-		} catch (ArrayIndexOutOfBoundsException e) {
-			System.out.println("You didn't enter any argument.");
-		}*/
 	}
 
 	public static boolean scan(String s) {
@@ -19,36 +12,21 @@ public class E1p2 {
 		int i = 0;
 		while(state >= 0 && i < s.length()) {
 			final char ch = s.charAt(i++);
-			if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || (ch == '_')))
-				state = -1;
-			switch (state) {
-				case 0:
-					if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
-						state = 3;
-					else if (ch == '_')
-						state = 2;
-					else if (ch >= '0' && ch <= '9')
-						state = 1;
-					break;
 
-				case 1:
-					if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || (ch == '_'))
-						state = 1;
-					break;
-
-				case 2:
-					if (ch == '_')
-						state = 2;
-					else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch >= '0' && ch <= '9')
-						state = 3;
-					break;
-
-				case 3:
-					if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || (ch == '_'))
-						state = 3;
-					break;
-			}
+			state = switch (state) {
+				case 0 -> getstate(ch, 2, -1, 1);
+				case 1 -> getstate(ch, 1, 1, 1);
+				case 2 -> getstate(ch, 2, 1, 1);
+				default->-1;
+			};
 		}
-		return state == 3;
+		return state == 1;
+	}
+
+	public static int getstate(char c, int is_, int isNum, int isLetter) {
+		if(c == '_') return is_;
+		if(c >= '0' && c <= '9') return isNum;
+		if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) return isLetter;
+		return -1;
 	}
 }

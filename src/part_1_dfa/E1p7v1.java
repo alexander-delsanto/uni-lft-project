@@ -1,5 +1,3 @@
-package part_1_dfa;
-
 public class E1p7v1{
 	public static void main(String[] args){
 		if (args.length == 0)
@@ -32,14 +30,14 @@ public class E1p7v1{
 					if (ch == 'e')
 						state += 1;
 					else
-						state += 9;
+						state += 9;	
 					break;
 
 				case 3:
 					if (ch == 'x')
 						state += 1;
 					else
-						state += 9;
+						state += 9;	
 					break;
 
 				case 4:
@@ -74,14 +72,14 @@ public class E1p7v1{
 					if (ch == 'r')
 						state = 18;
 					else
-						state += 9;
+						state += 9;	
 					break;
 
 				case 9:
 					if (ch == 'l')
 						state += 1;
 					else
-						state = 17;
+						state = 17;	
 					break;
 
 				case 10:
@@ -109,14 +107,14 @@ public class E1p7v1{
 					if (ch == 'n')
 						state += 1;
 					else
-						state = 17;
+						state = 17;	
 					break;
 
 				case 14:
 					if (ch == 'd')
 						state += 1;
 					else
-						state = 17;
+						state = 17;	
 					break;
 
 				case 15:
@@ -136,7 +134,7 @@ public class E1p7v1{
 				case 17:
 					break;
 
-				case 18:
+				case 18: 
 					state = 17;
 					break;
 			}

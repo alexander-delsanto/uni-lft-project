@@ -1,5 +1,3 @@
-package part_1_dfa;
-
 public class E1p4 {
 	public static void main(String[] args) {
 		if (args.length == 0)
@@ -14,87 +12,28 @@ public class E1p4 {
 		int i = 0;
 		while(state >= 0 && i < s.length()) {
 			final char ch = s.charAt(i++);
-			if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9')|| (ch == ' ')))
-				state = -1;
-			switch (state) {
-				case 0: //STATO INIZIALE
-					if (ch == ' ')
-						state = 0;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 == 0))
-						state = 2;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 != 0))
-						state = 3;
-					else
-						state = 1;
-					break;
 
-				case 1: //POZZO
-					if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || (ch == ' '))
-						state = 1;
-					break;
-
-				case 2: //PARI
-					if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 == 0))
-						state = 2;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 != 0))
-						state = 3;
-					else if ((ch >= 'A' && ch <= 'K'))
-						state = 4;
-					else if (ch == ' ')
-						state = 5;
-					else
-						state = 1;
-					break;
-
-				case 3: //DISPARI
-					if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 != 0))
-						state = 3;
-					else if ((ch >= '0' && ch <= '9') && ((ch - '0') % 2 == 0))
-						state = 2;
-					else if ((ch >= 'L' && ch <= 'Z'))
-						state = 4;
-					else if (ch == ' ')
-						state = 6;
-					else
-						state = 1;
-					break;
-
-				case 4: //STATO FINALE
-					if ((ch >= 'a' && ch <= 'z'))
-						state = 4;
-					else if (ch == ' ')
-						state = 7;
-					else
-						state = 1;
-					break;
-
-				case 5: //SPAZIO PARI
-					if (ch == ' ')
-						state = 5;
-					else if ((ch >= 'A' && ch <= 'K'))
-						state = 4;
-					else
-						state = 1;
-					break;
-
-				case 6: //SPAZIO DISPARI
-					if (ch == ' ')
-						state =6;
-					else if ((ch >= 'L' && ch <= 'Z'))
-						state = 4;
-					else
-						state = 1;
-					break;
-
-				case 7:
-					if (ch == ' ')
-						state = 7;
-					else if (ch >= 'A' && ch <= 'Z')
-						state = 4;
-					else state = 1;
-					break;
-			}
+			state = switch (state) {
+				case 0 -> getstate(ch, 1, 2, 0, -1, -1, -1);
+				case 1 -> getstate(ch, 1, 2, 3, 5, -1, -1);
+				case 2 -> getstate(ch, 1, 2, 4, -1, 5, -1);
+				case 3 -> getstate(ch, -1, -1, 3, 5, -1, -1);
+				case 4 -> getstate(ch, -1, -1, 4, -1, 5, -1);
+				case 5 -> getstate(ch, -1, -1, 6, -1, -1, 5);
+				case 6 -> getstate(ch, -1, -1, 6, 5, 5, -1);
+				default -> -1;
+			};
 		}
-		return (state == 4 || state == 7);
+		return state == 5 || state == 6;
+	}
+
+	public static int getstate(char c, int isEven, int isOdd, int isSpace, int isGA, int isGB, int isMin) {
+		if(c == '0' || c == '2' || c == '4' || c == '6' || c == '8') return isEven;
+		if(c == '1' || c == '3' || c == '5' || c == '7' || c == '9') return isOdd;
+		if(c == ' ') return isSpace;
+		if(c >= 'a' && c <= 'z') return isMin;
+		if(c >= 'A' && c <= 'K') return isGA;
+		if(c >= 'L' && c <= 'Z') return isGB;
+		return -1;
 	}
 }
