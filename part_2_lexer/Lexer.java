@@ -145,7 +145,7 @@ public class Lexer {
 
 	public static void main(String[] args) {
 		Lexer lex = new Lexer();
-		String path = "input.txt";
+		String path = "input.lft";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			Token tok;
