@@ -1,3 +1,5 @@
+package part_1_dfa;
+
 public class E1p1 {
     public static boolean scan(String s)
     {

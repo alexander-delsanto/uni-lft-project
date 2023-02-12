@@ -1,3 +1,5 @@
+package part_1_dfa;
+
 public class E1p5 {
 	public static void main(String[] args) {
 		if (args.length == 0)
@@ -6,7 +8,7 @@ public class E1p5 {
 			System.out.println(args[j] + " " + (scan(args[j]) ? "OK" : "NOPE"));
 		}
 	}
-	
+
 	public static boolean scan(String s) {
 		int state = 0;
 		int i = 0;

@@ -1,3 +1,5 @@
+package part_1_dfa;
+
 public class E1p2 {
 	public static void main(String[] args) {
 		if (args.length == 0)
