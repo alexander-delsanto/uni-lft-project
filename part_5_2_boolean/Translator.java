@@ -402,7 +402,7 @@ public class Translator {
 
 	public static void main(String[] args) throws IOException {
 		Lexer lex = new Lexer();
-		String path = "input.txt"; // il percorso del file da leggere
+		String path = "input.lft"; // il percorso del file da leggere
 
 		BufferedReader br = new BufferedReader(new FileReader(path));
 		Translator translator = new Translator(lex, br);
