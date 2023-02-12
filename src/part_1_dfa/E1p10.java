@@ -27,4 +27,9 @@ public class E1p10 {
 		if(c == 'a') return a;
 		return -1;
 	}
+<<<<<<< HEAD
 }
+=======
+    }
+}
+>>>>>>> c104d7520cdd53907455fb5633996e0c4f317fec
