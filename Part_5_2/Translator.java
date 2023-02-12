@@ -110,11 +110,13 @@ public class Translator {
 			case Tag.WHILE:
 				int lwhile_end = code.newLabel();
 				int lwhile_start = code.newLabel();
+				int lwhile_continue = code.newLabel();
 				code.emitLabel(lwhile_start);
 				match(Tag.WHILE);
 				match('(');
-				bexpr(lwhile_end, true, lwhile_end, false);
+				bexpr(lwhile_continue, lwhile_end, true);
 				match(')');
+				code.emitLabel(lwhile_continue);
 				stat();
 				code.emit(OpCode.GOto, lwhile_start);
 				code.emitLabel(lwhile_end);
@@ -238,11 +240,13 @@ public class Translator {
 	public void optitem(int nextLabel) {
 		switch(look.tag) {
 			case Tag.OPTION:
+				int bodyLabel = code.newLabel();
 				match(Tag.OPTION);
 				match('(');
-				bexpr(nextLabel, true, nextLabel, false);
+				bexpr(bodyLabel, nextLabel, false);
 				match(')');
 				match(Tag.DO);
+				code.emitLabel(bodyLabel);
 				stat();
 				break;
 			default:
@@ -250,7 +254,7 @@ public class Translator {
 		}
 	}
 
-	public boolean bexpr(int label, boolean negate, int nextLabel, boolean isOr) {
+	public void bexpr(int trueLabel, int falseLabel, boolean isWhile) {
 		switch(look.tag) {
 			case Tag.RELOP:
 				String temp = ((Word)look).lexeme;
@@ -259,56 +263,47 @@ public class Translator {
 				expr();
 				switch(temp) {
 					case "<":
-						if(negate) code.emit(OpCode.if_icmpge, label);
-						else code.emit(OpCode.if_icmplt, label);
+						code.emit(OpCode.if_icmpge, falseLabel);
 						break;
 					case ">":
-						if(negate) code.emit(OpCode.if_icmple, label);
-						else code.emit(OpCode.if_icmpgt, label);
+						code.emit(OpCode.if_icmple, falseLabel);
 						break;
 					case "<=":
-						if(negate) code.emit(OpCode.if_icmpgt, label);
-						else code.emit(OpCode.if_icmple, label);
+						code.emit(OpCode.if_icmpgt, falseLabel);
 						break;
 					case ">=":
-						if(negate) code.emit(OpCode.if_icmplt, label);
-						else code.emit(OpCode.if_icmpge, label);
+						code.emit(OpCode.if_icmplt, falseLabel);
 						break;
 					case "==":
-						if(negate) code.emit(OpCode.if_icmpne, label);
-						else code.emit(OpCode.if_icmpeq, label);
+						code.emit(OpCode.if_icmpne, falseLabel);
 						break;
 					case "<>":
-						if(negate) code.emit(OpCode.if_icmpeq, label);
-						else code.emit(OpCode.if_icmpne, label);
+						code.emit(OpCode.if_icmpeq, falseLabel);
 						break;
 					default:
 						break;
 				}
-				return false;
+				if(!isWhile)
+					code.emit(OpCode.GOto, trueLabel);
+				break;
 			case Tag.AND:
 				match(Tag.AND);
-				int next = code.newLabel();
-				bexpr(next, false, next, false);
-				if(isOr) code.emit(OpCode.GOto, label);
-				else code.emit(OpCode.GOto, nextLabel);
-				code.emitLabel(next);
-				bexpr(label, false, nextLabel, false);
-				return true;
+				int andContinue = code.newLabel();
+				bexpr(andContinue, falseLabel, false);
+				code.emitLabel(andContinue);
+				bexpr(trueLabel, falseLabel, false);
+				break;
 			case Tag.OR:
 				match(Tag.OR);
-				int orBody = code.newLabel();
-				bexpr(orBody, false, label, true);
-				bexpr(orBody, false, label, true);
-				code.emit(OpCode.GOto, label);
-				code.emitLabel(orBody);
-				return true;
+				int orContinue = code.newLabel();
+				bexpr(trueLabel, orContinue, false);
+				code.emitLabel(orContinue);
+				bexpr(trueLabel, falseLabel, false);
+				break;
 			case '!':
 				match('!');
-				boolean hasGoto = bexpr(label, false, label, false);
-				if(hasGoto)
-					code.emit(OpCode.GOto, label);
-				return false;
+				bexpr(falseLabel, trueLabel, false);
+				break;
 			default:
 				throw error("found " + look + " in bexpr");
 		}
