@@ -1,5 +1,0 @@
-read[a,b];
-while (<> a b)
-	conditional [ option (> a b) do assign - a b to a ]
-	else assign - b a to b end;
-print[a]
